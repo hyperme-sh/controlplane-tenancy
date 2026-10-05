@@ -14,3 +14,10 @@ the common application environment. `AIUDITOR_CRAWL_TENANT_ID` and
 Legacy persistence modules alias the shared implementations, so old and new
 imports use the same ContextVar and session maker. Public source contracts use
 the workspace's 0.8.0 train. No schema or migration change accompanies extraction.
+
+`python -m controlplane_tenancy.startup` runs the database migration command and
+then provisions the configured marketplace before applications seed tenant data.
+An existing active tenant is preserved; an inactive tenant fails startup. Both
+Compose migration jobs and the Edge/Hypermesh entrypoints use this command.
+Frozen migrations are unchanged. Browser enrollment reads the deployed target
+from `GET /auth/enrollment/marketplace` instead of embedding a tenant UUID.
