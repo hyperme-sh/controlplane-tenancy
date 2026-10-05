@@ -13,7 +13,7 @@ the common application environment. `AIUDITOR_CRAWL_TENANT_ID` and
 
 Legacy persistence modules alias the shared implementations, so old and new
 imports use the same ContextVar and session maker. Public source contracts use
-the workspace's 0.9.0 train. No schema or migration change accompanies extraction.
+the workspace's 0.10.0 train. No schema or migration change accompanies extraction.
 
 `python -m controlplane_tenancy.startup` runs the database migration command and
 then provisions the configured marketplace before applications seed tenant data.
