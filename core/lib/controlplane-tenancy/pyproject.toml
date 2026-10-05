@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "controlplane-tenancy"
+version = "0.8.0"
+requires-python = ">=3.13"
+dependencies = ["controlplane-db", "sqlalchemy>=2.0.43"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/controlplane_tenancy"]
+
+[tool.uv.sources]
+controlplane-db = { workspace = true }
