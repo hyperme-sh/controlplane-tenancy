@@ -54,9 +54,9 @@ async def get_tenant_membership_row(
     return None
 
 
-async def _keycloak_sub_is_free(session: AsyncSession, keycloak_sub: str) -> bool:
+async def _keycloak_sub_is_free(session: AsyncSession, tenant_id: uuid.UUID, keycloak_sub: str) -> bool:
     found = await session.execute(
-        select(User.id).where(User.keycloak_sub == keycloak_sub)
+        select(User.id).where(User.tenant_id == tenant_id, User.keycloak_sub == keycloak_sub)
     )
     return found.scalar_one_or_none() is None
 
@@ -78,7 +78,7 @@ async def create_tenant_membership_row(
     Keycloak person. Match later by email or ``keycloak_sub``.
     """
     sub = keycloak_sub.strip() if keycloak_sub and keycloak_sub.strip() else None
-    if sub is not None and not await _keycloak_sub_is_free(session, sub):
+    if sub is not None and not await _keycloak_sub_is_free(session, tenant_id, sub):
         sub = None
     row = User(
         id=uuid.uuid4(),
