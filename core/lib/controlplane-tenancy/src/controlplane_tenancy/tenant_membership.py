@@ -95,3 +95,26 @@ async def create_tenant_membership_row(
     await session.flush()
     await session.refresh(row)
     return row
+
+
+async def get_active_tenant_role_member(
+    session: AsyncSession, tenant_id: uuid.UUID, *, keycloak_sub: str, role: str,
+) -> User | None:
+    """Recheck active tenant, subject binding and durable group membership.
+
+    Email is deliberately absent: a role grant belongs to a bound subject, not
+    to another account that happens to present the same email claim.
+    """
+    from controlplane_db.models import Group, Tenant, UserGroupMembership
+
+    result = await session.execute(
+        select(User).join(Tenant, Tenant.id == User.tenant_id)
+        .join(UserGroupMembership, (UserGroupMembership.user_id == User.id)
+              & (UserGroupMembership.tenant_id == User.tenant_id))
+        .join(Group, (Group.id == UserGroupMembership.group_id) & (Group.tenant_id == User.tenant_id))
+        .where(User.tenant_id == tenant_id, User.keycloak_sub == keycloak_sub,
+               User.deleted_at.is_(None), User.is_active.is_(True),
+               Tenant.is_active.is_(True), func.lower(Group.name) == role.lower())
+        .limit(1)
+    )
+    return result.scalar_one_or_none()
