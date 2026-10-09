@@ -15,9 +15,12 @@ import uuid
 from datetime import UTC, datetime
 
 from controlplane_db.models import User
-from controlplane_tenancy.marketplace import MARKETPLACE_TENANT_ID as MARKETPLACE_TENANT_ID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from controlplane_tenancy.marketplace import (
+    MARKETPLACE_TENANT_ID,  # noqa: F401 - legacy public export
+)
 
 # Existing Hypermesh marketplace tenant. Enrollment INSERTs the users row
 # here. Do not assume the row exists (seeded renter has none today).
