@@ -12,16 +12,18 @@ A raw OIDC renter cannot call that route. Not ``POST /api/v1/tenants/``.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
+from controlplane_db.models import User
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from controlplane_db.models import User
+from controlplane_tenancy.marketplace import (
+    MARKETPLACE_TENANT_ID,  # noqa: F401 - legacy public export
+)
 
 # Existing Hypermesh marketplace tenant. Enrollment INSERTs the users row
 # here. Do not assume the row exists (seeded renter has none today).
-from controlplane_tenancy.marketplace import MARKETPLACE_TENANT_ID
 
 
 async def get_tenant_membership_row(
@@ -54,9 +56,13 @@ async def get_tenant_membership_row(
     return None
 
 
-async def _keycloak_sub_is_free(session: AsyncSession, tenant_id: uuid.UUID, keycloak_sub: str) -> bool:
+async def _keycloak_sub_is_free(
+    session: AsyncSession, tenant_id: uuid.UUID, keycloak_sub: str
+) -> bool:
     found = await session.execute(
-        select(User.id).where(User.tenant_id == tenant_id, User.keycloak_sub == keycloak_sub)
+        select(User.id).where(
+            User.tenant_id == tenant_id, User.keycloak_sub == keycloak_sub
+        )
     )
     return found.scalar_one_or_none() is None
 
@@ -88,10 +94,78 @@ async def create_tenant_membership_row(
         last_name=last_name,
         gender=gender,
         is_active=is_active,
-        activated_at=datetime.now(timezone.utc) if is_active else None,
+        activated_at=datetime.now(UTC) if is_active else None,
         keycloak_sub=sub,
     )
     session.add(row)
     await session.flush()
     await session.refresh(row)
     return row
+
+
+async def get_active_tenant_role_member(
+    session: AsyncSession,
+    tenant_id: uuid.UUID,
+    *,
+    keycloak_sub: str,
+    role: str,
+) -> User | None:
+    """Recheck active tenant, subject binding and durable group membership.
+
+    Email is deliberately absent: a role grant belongs to a bound subject, not
+    to another account that happens to present the same email claim.
+    """
+    from controlplane_db.models import Group, Tenant, UserGroupMembership
+
+    result = await session.execute(
+        select(User)
+        .join(Tenant, Tenant.id == User.tenant_id)
+        .join(
+            UserGroupMembership,
+            (UserGroupMembership.user_id == User.id)
+            & (UserGroupMembership.tenant_id == User.tenant_id),
+        )
+        .join(
+            Group,
+            (Group.id == UserGroupMembership.group_id)
+            & (Group.tenant_id == User.tenant_id),
+        )
+        .where(
+            User.tenant_id == tenant_id,
+            User.keycloak_sub == keycloak_sub,
+            User.deleted_at.is_(None),
+            User.is_active.is_(True),
+            Tenant.is_active.is_(True),
+            func.lower(Group.name) == role.lower(),
+        )
+        .limit(1)
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_tenant_role_group_ids(
+    session: AsyncSession,
+    tenant_id: uuid.UUID,
+    *,
+    user_id: uuid.UUID,
+    role: str,
+) -> list[uuid.UUID]:
+    """Return only tenant-scoped durable groups authorizing this role.
+
+    Products apply their own group policies to opaque IDs; membership tables
+    remain owned and queried by this shared contract.
+    """
+    from controlplane_db.models import Group, UserGroupMembership
+
+    return list(
+        await session.scalars(
+            select(UserGroupMembership.group_id)
+            .join(Group, Group.id == UserGroupMembership.group_id)
+            .where(
+                UserGroupMembership.tenant_id == tenant_id,
+                UserGroupMembership.user_id == user_id,
+                Group.tenant_id == tenant_id,
+                func.lower(Group.name) == role.lower(),
+            )
+        )
+    )

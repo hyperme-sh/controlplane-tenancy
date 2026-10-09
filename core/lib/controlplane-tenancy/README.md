@@ -21,3 +21,6 @@ An existing active tenant is preserved; an inactive tenant fails startup. Both
 Compose migration jobs and the Edge/Hypermesh entrypoints use this command.
 Frozen migrations are unchanged. Browser enrollment reads the deployed target
 from `GET /auth/enrollment/marketplace` instead of embedding a tenant UUID.
+
+`get_tenant_role_group_ids` returns tenant-scoped opaque group IDs for a user/role.
+Product policies consume these IDs without querying platform membership tables.
