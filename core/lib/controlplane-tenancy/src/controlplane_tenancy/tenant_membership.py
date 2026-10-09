@@ -110,12 +110,23 @@ async def get_active_tenant_role_member(
     keycloak_sub: str,
     role: str,
 ) -> User | None:
-    """Recheck active tenant, subject binding and durable group membership.
+    """Recheck active tenant, subject binding and direct or grouped role assignment.
 
     Email is deliberately absent: a role grant belongs to a bound subject, not
     to another account that happens to present the same email claim.
     """
-    from controlplane_db.models import Group, Tenant, UserGroupMembership
+    from controlplane_db.models import Group, Role, Tenant, UserGroupMembership
+    from sqlalchemy import or_
+
+    direct = await session.scalar(select(User).join(Tenant, Tenant.id == User.tenant_id)
+        .join(Role, Role.id == User.role_id).where(
+            User.tenant_id == tenant_id, User.keycloak_sub == keycloak_sub,
+            User.deleted_at.is_(None), User.is_active.is_(True), Tenant.is_active.is_(True),
+            or_(Role.tenant_id == tenant_id, Role.tenant_id.is_(None)),
+            func.lower(Role.name) == role.lower(),
+        ).limit(1))
+    if direct is not None:
+        return direct
 
     result = await session.execute(
         select(User)
