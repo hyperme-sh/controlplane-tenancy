@@ -11,3 +11,5 @@ alias tests belong in core/tests/tests/unit/test_identity_tenancy_libraries.py.
 Platform directory access uses `controlplane_tenancy.directory`; HTTP DTOs,
 authorization, IdP proofs and audits remain with consuming services. Owner
 repositories return detached views and preserve caller transaction ownership.
+
+`controlplane_tenancy.tenant_registry` owns tenant enumeration and status reads, preserving caller database authority, transactions and optional tenant row locks.

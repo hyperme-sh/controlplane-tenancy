@@ -44,3 +44,5 @@ Existing host identity checks, tenant-state checks and transaction locks remain.
 The contract intentionally advances the six source-contract versions to 0.18.0;
 control-plane 0.8.0, event/service versions and hm1/v=1 are unchanged. No schema,
 provider operation, new HTTP endpoint or deployment is added.
+
+`controlplane_tenancy.tenant_registry` owns tenant enumeration and status reads, preserving caller database authority, transactions and optional tenant row locks.
