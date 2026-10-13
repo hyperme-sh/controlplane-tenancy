@@ -379,9 +379,10 @@ class SqlOrganizationRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._s = session
 
-    async def create(self, tenant_id: uuid.UUID, legal_name: str) -> OrganizationView:
+    async def create(self, tenant_id: uuid.UUID, legal_name: str, *,
+                     organization_id: uuid.UUID | None = None) -> OrganizationView:
         o = Organization(
-            id=uuid.uuid4(),
+            id=organization_id or uuid.uuid4(),
             tenant_id=tenant_id,
             legal_name=legal_name,
         )
