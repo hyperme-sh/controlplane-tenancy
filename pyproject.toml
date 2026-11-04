@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "controlplane-tenancy"
 version = "0.14.0"
 requires-python = ">=3.13"
-dependencies = ["controlplane-db @ git+https://github.com/hyperme-sh/controlplane-db.git@9cfad090c48e28bc33d1a96369e7e856c203a2bf", "sqlalchemy>=2.0.43"]
+dependencies = ["controlplane-db @ git+https://github.com/hyperme-sh/controlplane-db.git@d241123db7b706d4400d68b7b8b4ff38b2a75dd4", "sqlalchemy>=2.0.43"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/controlplane_tenancy"]

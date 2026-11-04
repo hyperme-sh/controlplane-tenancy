@@ -11,6 +11,7 @@ A raw OIDC renter cannot call that route. Not ``POST /api/v1/tenants/``.
 
 from __future__ import annotations
 
+import os
 import uuid
 from datetime import UTC, datetime
 
@@ -83,7 +84,17 @@ async def create_tenant_membership_row(
     Never assume a ``public.users`` row already exists for the identified
     Keycloak person. Match later by email or ``keycloak_sub``.
     """
-    sub = keycloak_sub.strip() if keycloak_sub and keycloak_sub.strip() else None
+    # Subjects are opaque. Never trim them into another identity.
+    sub = keycloak_sub if keycloak_sub and keycloak_sub.strip() else None
+    if (
+        sub is not None
+        and os.environ.get("ACCOUNT_CLOSURE_ENFORCEMENT_ENABLED", "").lower() == "true"
+    ):
+        from controlplane_db.models import IdentityRetirement
+
+        await lock_identity(session, sub)
+        if await session.get(IdentityRetirement, sub) is not None:
+            raise ValueError("Identity has been retired")
     if sub is not None and not await _keycloak_sub_is_free(session, tenant_id, sub):
         sub = None
     row = User(
@@ -118,13 +129,21 @@ async def get_active_tenant_role_member(
     from controlplane_db.models import Group, Role, Tenant, UserGroupMembership
     from sqlalchemy import or_
 
-    direct = await session.scalar(select(User).join(Tenant, Tenant.id == User.tenant_id)
-        .join(Role, Role.id == User.role_id).where(
-            User.tenant_id == tenant_id, User.keycloak_sub == keycloak_sub,
-            User.deleted_at.is_(None), User.is_active.is_(True), Tenant.is_active.is_(True),
+    direct = await session.scalar(
+        select(User)
+        .join(Tenant, Tenant.id == User.tenant_id)
+        .join(Role, Role.id == User.role_id)
+        .where(
+            User.tenant_id == tenant_id,
+            User.keycloak_sub == keycloak_sub,
+            User.deleted_at.is_(None),
+            User.is_active.is_(True),
+            Tenant.is_active.is_(True),
             or_(Role.tenant_id == tenant_id, Role.tenant_id.is_(None)),
             func.lower(Role.name) == role.lower(),
-        ).limit(1))
+        )
+        .limit(1)
+    )
     if direct is not None:
         return direct
 
@@ -180,3 +199,46 @@ async def get_tenant_role_group_ids(
             )
         )
     )
+
+
+async def lock_identity(session: AsyncSession, subject: str) -> None:
+    """Serialize membership creation against realm-wide retirement; caller commits."""
+    from sqlalchemy import text
+
+    if not subject or not subject.strip() or len(subject) > 512:
+        raise ValueError("An exact identity subject is required")
+    await session.execute(
+        text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"),
+        {"key": f"identity-retirement:{subject}"},
+    )
+
+
+async def retire_identity(
+    session: AsyncSession, subject: str, retired_at: datetime
+) -> datetime:
+    """Permanently fence new memberships; return immutable first retirement time."""
+    from controlplane_db.models import IdentityRetirement
+    from sqlalchemy.dialects.postgresql import insert
+
+    if retired_at.tzinfo is None or retired_at.utcoffset() is None:
+        raise ValueError("An aware retirement time is required")
+    await lock_identity(session, subject)
+    await session.execute(
+        insert(IdentityRetirement)
+        .values(
+            subject=subject,
+            retired_at=retired_at,
+        )
+        .on_conflict_do_nothing(index_elements=["subject"])
+    )
+    return (await session.get(IdentityRetirement, subject)).retired_at
+
+
+async def identity_retired_at(session: AsyncSession, subject: str) -> datetime | None:
+    """Read the exact committed retirement marker without exposing its table."""
+    from controlplane_db.models import IdentityRetirement
+
+    if not subject or not subject.strip() or len(subject) > 512:
+        raise ValueError("An exact identity subject is required")
+    row = await session.get(IdentityRetirement, subject, populate_existing=True)
+    return row.retired_at if row is not None else None

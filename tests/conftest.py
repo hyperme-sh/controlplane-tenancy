@@ -31,3 +31,22 @@ async def async_engine():
         with admin.connect() as cx:
             cx.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
         admin.dispose()
+
+
+@pytest.fixture
+async def closure_sync_url(async_engine):
+    return async_engine.url.set(drivername="postgresql+psycopg").render_as_string(hide_password=False)
+
+
+@pytest.fixture
+async def seed(async_engine):
+    from types import SimpleNamespace
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+    from controlplane_db.models import Role, Tenant
+    ta, tb, ra, rb = [uuid.uuid4() for _ in range(4)]
+    async with async_sessionmaker(async_engine)() as session:
+        session.add_all([Tenant(id=ta, name=str(ta), is_active=True), Tenant(id=tb, name=str(tb), is_active=True)])
+        await session.flush()
+        session.add_all([Role(id=ra, tenant_id=ta, name="admin", permissions=[]), Role(id=rb, tenant_id=tb, name="admin", permissions=[])])
+        await session.commit()
+    return SimpleNamespace(ta=ta,tb=tb,ra=ra,rb=rb)

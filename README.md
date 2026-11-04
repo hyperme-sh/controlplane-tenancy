@@ -58,3 +58,19 @@ organization policy may shorten it). Expired evidence fails closed: validate a
 new main revision. The publisher verifies the run, source, workflow and artifact
 digest independently of release metadata. Repository immutable releases must be
 enabled. See the [shared release contract](https://github.com/hyperme-sh/.github/blob/7749591fccd30d46ba9b0adabe82114001c9d0de/actions/release-channel/README.md).
+
+## Retirement and profile owner APIs
+
+`tenant_membership` now provides caller-transaction identity locking, immutable
+retirement markers and exact retirement reads. When enforcement is explicitly
+enabled, membership creation checks the canonical marker before creating any
+membership in any tenant. Opaque subjects are never trimmed into another identity.
+`account_profile` owns scope-bound membership disablement and personal profile
+erasure while preserving financial records, other people and company assets.
+Helpers do not authorize HTTP callers, commit transactions or choose tenant GUCs.
+
+The database dependency is pinned to the reconciled closure migration revision.
+With a disposable TEST_DATABASE_URL, all 21 package cases exercise real directory,
+profile and retirement boundaries from source, installed wheel and rebuilt sdist.
+The existing production retention/hold policy is unchanged; TEST exemption work
+is separate from this dependency adoption. No flags, grants or deployment change.
