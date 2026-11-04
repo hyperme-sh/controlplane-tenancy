@@ -8,6 +8,7 @@ from controlplane_db.models import (
     BillingRecord,
     User,
     UserPasskey,
+    UserPasskeyChallenge,
     UserPreference,
     UserWalletBinding,
 )
@@ -20,8 +21,9 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
+@pytest.mark.parametrize("whitespace", ["", "\t\n\r", "\u0085\u2003\u3000"])
 async def test_erasure_fences_profile_and_preserves_bills_and_other_tenants(
-    closure_sync_url, seed
+    closure_sync_url, seed, whitespace
 ):
     engine = create_async_engine(
         closure_sync_url.replace("postgresql+psycopg://", "postgresql+asyncpg://")
@@ -31,7 +33,7 @@ async def test_erasure_fences_profile_and_preserves_bills_and_other_tenants(
     identifiers = {seed.ta: uuid.uuid4(), seed.tb: uuid.uuid4()}
     closed = datetime.now(UTC) - timedelta(days=89)
     bill = uuid.uuid4()
-    email = subject + "@example.invalid"
+    email = whitespace + subject + "@example.invalid" + whitespace
 
     async def scope(session, tenant):
         await session.execute(
@@ -73,6 +75,8 @@ async def test_erasure_fences_profile_and_preserves_bills_and_other_tenants(
                         credentials=[{"credential": "not-real"}],
                     )
                 )
+            session.add(UserPasskeyChallenge(tenant_id=seed.ta, email=email,
+                challenge="owned-fixture", expires_at=datetime.now(UTC) + timedelta(minutes=5)))
             session.add(
                 BillingRecord(
                     id=bill,
@@ -133,6 +137,7 @@ async def test_erasure_fences_profile_and_preserves_bills_and_other_tenants(
                 deleted["profiles"] == 1
                 and deleted["user_preferences"] == 1
                 and deleted["user_passkeys"] == 1
+                and deleted["user_passkey_challenges"] == 1
             )
         async with maker.begin() as session:
             await scope(session, seed.ta)
@@ -468,8 +473,9 @@ async def test_legacy_history_deletion_requires_full_reference_proof(
         await engine.dispose()
 
 
+@pytest.mark.parametrize("whitespace", [" ", "\t\n\r", "\u0085\u2003\u3000"])
 async def test_ambiguous_legacy_email_credentials_are_not_deleted(
-    closure_sync_url, seed
+    closure_sync_url, seed, whitespace
 ):
     engine = create_async_engine(
         closure_sync_url.replace("postgresql+psycopg://", "postgresql+asyncpg://")
@@ -483,7 +489,7 @@ async def test_ambiguous_legacy_email_credentials_are_not_deleted(
         async with maker.begin() as session:
             for identifier, sub, address in (
                 (owner, subject, email),
-                (other, "other-" + subject, " " + email + " "),
+                (other, "other-" + subject, whitespace + email + whitespace),
             ):
                 session.add(
                     User(

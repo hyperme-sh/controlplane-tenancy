@@ -33,6 +33,14 @@ from controlplane_tenancy.tenant_membership import lock_identity
 
 ACCOUNT_PROFILE_RETENTION = timedelta(days=89)
 
+# Match every code point handled by Python str.strip(), independent of SQL
+# btrim defaults. All comparisons and deletion predicates use this expression.
+_EMAIL_WHITESPACE = '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000'
+
+
+def _normalized_email(field):
+    return func.lower(func.btrim(field, _EMAIL_WHITESPACE))
+
 
 def _test_plane_wipes_freely() -> bool:
     """True only for the exact test-plane setting ``ACCOUNT_CLOSURE_RETENTION=none``.
@@ -219,13 +227,18 @@ async def purge_retired_profile(
             and row.email == placeholder
         ):
             raise ValueError("Profile inventory does not belong to retired subject")
-    emails = [row.email.strip().lower() for row in rows if row.keycloak_sub == subject]
+    emails = list(await session.scalars(
+        select(_normalized_email(User.email)).where(
+            User.id.in_([row.id for row in rows]), User.tenant_id == tenant_id,
+            User.keycloak_sub == subject,
+        )
+    ))
     ambiguous = await session.scalar(
         select(User.id)
         .where(
             User.tenant_id == tenant_id,
             User.id.not_in([row.id for row in rows]),
-            func.lower(func.btrim(User.email)).in_(emails),
+            _normalized_email(User.email).in_(emails),
         )
         .limit(1)
     )
@@ -253,7 +266,7 @@ async def purge_retired_profile(
     ):
         result = await session.execute(
             delete(model).where(
-                model.tenant_id == tenant_id, func.lower(func.btrim(field)).in_(emails)
+                model.tenant_id == tenant_id, _normalized_email(field).in_(emails)
             )
         )
         counts[model.__tablename__] = result.rowcount
