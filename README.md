@@ -36,7 +36,7 @@ HTTP/auth behavior require separate integration validation.
 
 ## Automated checks
 
-The included main-branch/manual workflow uses disposable hosted workers and a
+The included main-branch/manual workflow uses the shared-local self-hosted Linux runners and a
 PostgreSQL service. It requires `DEPENDENCY_READ_TOKEN` scoped to contents:read
 on hyperme-sh/controlplane-db. It is supplied only to the dependency-install/test
 step via an exact-repository Git HTTP header. Fork and pull-request workflows do
