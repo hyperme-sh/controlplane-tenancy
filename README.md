@@ -23,8 +23,8 @@ Use Python 3.13 and uv 0.11.26 with read access to the private database dependen
 bash scripts/check-package.sh
 ```
 
-The distribution metadata pins controlplane-db to merged commit
-`b26ab470c1f5de5840d0dbaeaacffed79b02a83c`. Tests run from source, an ordinary
+The distribution metadata pins controlplane-db to coordinated migration commit
+`9cfad090c48e28bc33d1a96369e7e856c203a2bf`. Tests run from source, an ordinary
 fresh-wheel install that resolves that dependency, and a rebuilt source archive.
 Wheel contents are compared against the current runtime source.
 
