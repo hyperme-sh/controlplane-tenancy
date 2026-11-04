@@ -24,7 +24,7 @@ bash scripts/check-package.sh
 ```
 
 The distribution metadata pins controlplane-db to coordinated migration commit
-`17e8c60bc2fea5af890299624ec97e1e7148b2a2`. Tests run from source, an ordinary
+`9cfad090c48e28bc33d1a96369e7e856c203a2bf`. Tests run from source, an ordinary
 fresh-wheel install that resolves that dependency, and a rebuilt source archive.
 Wheel contents are compared against the current runtime source.
 
