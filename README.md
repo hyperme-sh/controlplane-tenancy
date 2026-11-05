@@ -106,3 +106,10 @@ publisher independently verifies a real immutable stable baseline and refuses
 qualification snapshots, even if a caller job reports success. Existing valid
 stable records are retained; no release, version change, deployment or human
 approval prerequisite is introduced by this correction.
+
+The package gate also retains Panopticon's PostgreSQL database-ahead startup
+case: an older image on the prior owner branch must leave the newer database
+head intact, warn, and complete both database and tenancy startup. Migration
+resources come from the installed dependency. All source, wheel, and rebuilt
+source-distribution inventories must match and pass without skips; a disposable
+`TEST_DATABASE_URL` is required.

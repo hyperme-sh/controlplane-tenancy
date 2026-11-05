@@ -13,7 +13,7 @@ from controlplane_db import migrations
 async def async_engine():
     url = os.environ.get('TEST_DATABASE_URL')
     if not url:
-        pytest.skip('requires disposable PostgreSQL TEST_DATABASE_URL')
+        pytest.fail('requires disposable PostgreSQL TEST_DATABASE_URL')
     base = make_url(url).set(drivername='postgresql+psycopg')
     name = 'tenancy_test_' + uuid.uuid4().hex
     admin = create_engine(base, isolation_level='AUTOCOMMIT')
@@ -50,3 +50,30 @@ async def seed(async_engine):
         session.add_all([Role(id=ra, tenant_id=ta, name="admin", permissions=[]), Role(id=rb, tenant_id=tb, name="admin", permissions=[])])
         await session.commit()
     return SimpleNamespace(ta=ta,tb=tb,ra=ra,rb=rb)
+
+
+@pytest.fixture
+def migration_database():
+    raw = os.environ.get('TEST_DATABASE_URL')
+    if not raw:
+        pytest.fail('requires disposable PostgreSQL TEST_DATABASE_URL')
+    base = make_url(raw).set(drivername='postgresql+psycopg')
+    admin = create_engine(base, isolation_level='AUTOCOMMIT')
+    created = []
+    def make():
+        name = 'tenancy_ahead_' + uuid.uuid4().hex
+        with admin.connect() as cx:
+            cx.execute(text(f'CREATE DATABASE "{name}"'))
+        created.append(name)
+        return base.set(database=name).render_as_string(hide_password=False)
+    try:
+        yield make
+    finally:
+        with admin.connect() as cx:
+            for name in created:
+                cx.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+        admin.dispose()
+
+
+def pytest_configure(config):
+    config.addinivalue_line('markers', 'integration: disposable PostgreSQL owner integration')
