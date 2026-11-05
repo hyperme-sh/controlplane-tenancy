@@ -113,3 +113,8 @@ head intact, warn, and complete both database and tenancy startup. Migration
 resources come from the installed dependency. All source, wheel, and rebuilt
 source-distribution inventories must match and pass without skips; a disposable
 `TEST_DATABASE_URL` is required.
+
+Marketplace startup retains the three owner-chain source cases: adoption of a
+frozen legacy database, explicit legacy mode, and fresh owner bootstrap. Each
+case checks repeatable provisioning, preservation of an existing name, and
+refusal to reactivate an inactive marketplace tenant.
