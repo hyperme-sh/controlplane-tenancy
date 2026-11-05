@@ -1,5 +1,14 @@
 # controlplane-tenancy
 
+## Current version authority
+
+Current development version: `0.14.0`. The services remain before the unreleased
+0.24.0 milestone. Earlier 0.24/1.0 preparation and publication notes below are
+historical and do not authorize those versions. Existing tags and historical
+artifacts remain untouched. Development uses exact source pins and rebuilt
+artifacts; no prior release is required. Version changes, tags and publication
+require the owner's explicit authorization to the agent.
+
 Shared database-session context, PostgreSQL tenant GUC, membership helpers,
 marketplace tenant configuration, detached directory views and tenant registry
 queries. Depends on `controlplane-db`, not legacy API or product implementations.
@@ -91,8 +100,9 @@ The PR lane also runs directory integration against disposable PostgreSQL.
 
 ## Closure release candidate
 
-The closure runtime changes require version 1.0.0 under the conservative
-packaged-byte compatibility policy. Accepted baseline artifacts remain unchanged.
+The closure runtime is qualified at the restored development version 0.14.0.
+Packaged-byte differences do not authorize version advancement. Historical
+baseline artifacts remain unchanged.
 Package and disposable database checks do not establish deployed acceptance.
 
 The DB 1.0.0 fixture is built from pending DB #11 at `482943cbcd78ffd1a3d2ad4e1088ed7ed0cdeaea`,
