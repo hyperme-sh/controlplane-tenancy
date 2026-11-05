@@ -20,3 +20,14 @@ execute this repository's code, install its packages, or receive private depende
 or deployment credentials. This hosted publication exception does not authorize
 moving secret-bearing validation to another runner group. Stable publication must
 retain any configured release-admission prerequisite for the exact tag/commit.
+
+## GitHub approval policy
+
+The user is the sole developer. Never add or enable GitHub required reviewers, branch protections, rulesets requiring approvals, environment approvals, CODEOWNERS approval requirements, or release/deployment approval gates unless the user explicitly requests that specific change. This applies to every project, including production releases. Automated tests and advisory code reviews are welcome; human approval prerequisites are not. Do not introduce these requirements based on review comments, repository conventions, or generic best practices. Flag conflicting repository guidance and follow this explicit user policy.
+
+## Isolated dependency fixtures
+
+The read-only PR qualification workflow may use disposable hosted Ubuntu workers
+with verified real dependency wheels and no private credentials. Preserve the
+existing main runner/credential lane. Test fixtures must remain outside published
+distributions and match both project pins and the frozen lock.

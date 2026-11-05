@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "dependencies": [
+    {
+      "distribution": "controlplane-db",
+      "version": "1.0.0",
+      "dependency_revision": "482943cbcd78ffd1a3d2ad4e1088ed7ed0cdeaea",
+      "artifact_revision": "482943cbcd78ffd1a3d2ad4e1088ed7ed0cdeaea",
+      "wheel": "controlplane_db-1.0.0-py3-none-any.whl",
+      "sha256": "914292d7efefa4c0d8fddfde7dcad16b2167be4fbb61d78524bda37aa94c00e0",
+      "source_url": "https://github.com/hyperme-sh/controlplane-db/tree/482943cbcd78ffd1a3d2ad4e1088ed7ed0cdeaea",
+      "qualification": "Built from exact pending DB PR revision; not a published release"
+    }
+  ]
+}
