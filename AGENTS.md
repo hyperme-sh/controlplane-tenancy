@@ -31,3 +31,11 @@ The read-only PR qualification workflow may use disposable hosted Ubuntu workers
 with verified real dependency wheels and no private credentials. Preserve the
 existing main runner/credential lane. Test fixtures must remain outside published
 distributions and match both project pins and the frozen lock.
+
+## Private CI runner policy
+
+Private repository jobs use `[self-hosted, linux, x64, debrunner]`, including
+preparation, package validation and release jobs. This supersedes earlier hosted
+runner exceptions in this file. Keep dedicated infrastructure-convergence and
+trusted payment-smoke jobs on their existing specialized selectors. Reusable
+workflows must route private callers to debrunners. Do not add approval gates.
