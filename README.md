@@ -58,9 +58,24 @@ new main revision. The publisher verifies the run, source, workflow and artifact
 digest independently of release metadata. Repository immutable releases must be
 enabled. See the [shared release contract](https://github.com/hyperme-sh/.github/blob/7749591fccd30d46ba9b0adabe82114001c9d0de/actions/release-channel/README.md).
 
+## Retirement and profile owner APIs
+
+`tenant_membership` now provides caller-transaction identity locking, immutable
+retirement markers and exact retirement reads. When enforcement is explicitly
+enabled, membership creation checks the canonical marker before creating any
+membership in any tenant. Opaque subjects are never trimmed into another identity.
+`account_profile` owns scope-bound membership disablement and personal profile
+erasure while preserving financial records, other people and company assets.
+Helpers do not authorize HTTP callers, commit transactions or choose tenant GUCs.
+
+The database dependency is pinned to the reconciled closure migration revision.
+With a disposable TEST_DATABASE_URL, all 25 package cases exercise real directory,
+profile and retirement boundaries from source, installed wheel and rebuilt sdist.
+The existing production retention/hold policy is unchanged; TEST exemption work
+is separate from this dependency adoption. No flags, grants or deployment change.
 ## Isolated pull-request qualification
 
-`bash scripts/check-package.sh --fixtures` uses real published dependency wheels
+`bash scripts/check-package.sh --fixtures` uses real dependency wheels
 from `tests_artifacts/dependencies`, bound to the declared full Git revisions,
 locked versions and SHA-256 digests. The fixtures are excluded from wheel and
 source distributions. Missing/tampered artifacts or changed pins fail validation.
@@ -75,3 +90,12 @@ binds candidate digests to those builds. Rebuilt-sdist contracts must match.
 Conservative byte comparisons reject implementation-only patch changes too;
 semantic compatibility, installer metadata and deployed consumers remain distinct.
 The PR lane also runs directory integration against disposable PostgreSQL.
+
+## Closure release candidate
+
+The closure runtime changes require version 1.0.0 under the conservative
+packaged-byte compatibility policy. Accepted baseline artifacts remain unchanged.
+Package and disposable database checks do not establish deployed acceptance.
+
+The DB 1.0.0 fixture is built from pending DB #11 at `482943cbcd78ffd1a3d2ad4e1088ed7ed0cdeaea`,
+not a published release. Merge that owner adoption before this dependent PR.
