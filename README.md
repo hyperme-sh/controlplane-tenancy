@@ -24,7 +24,7 @@ bash scripts/check-package.sh
 ```
 
 The distribution metadata pins controlplane-db to coordinated migration commit
-`9cfad090c48e28bc33d1a96369e7e856c203a2bf`. Tests run from source, an ordinary
+`6ee52fe3e775548956cada649715fdde80f6cd1d`. Tests run from source, an ordinary
 fresh-wheel install that resolves that dependency, and a rebuilt source archive.
 Wheel contents are compared against the current runtime source.
 
@@ -41,8 +41,7 @@ PostgreSQL service. It requires `DEPENDENCY_READ_TOKEN` scoped to contents:read
 on hyperme-sh/controlplane-db. It is supplied only to the dependency-install/test
 step via an exact-repository Git HTTP header. Fork and pull-request workflows do
 not receive this credential. No token is committed or copied from a deployment.
-Repository Actions remain disabled until dependency access and workflow policy
-are configured and a destination run passes; local checks are not CI acceptance.
+The main lane retains scoped dependency access; local checks are not CI acceptance.
 
 ## Release channels
 
@@ -58,3 +57,21 @@ organization policy may shorten it). Expired evidence fails closed: validate a
 new main revision. The publisher verifies the run, source, workflow and artifact
 digest independently of release metadata. Repository immutable releases must be
 enabled. See the [shared release contract](https://github.com/hyperme-sh/.github/blob/7749591fccd30d46ba9b0adabe82114001c9d0de/actions/release-channel/README.md).
+
+## Isolated pull-request qualification
+
+`bash scripts/check-package.sh --fixtures` uses real published dependency wheels
+from `tests_artifacts/dependencies`, bound to the declared full Git revisions,
+locked versions and SHA-256 digests. The fixtures are excluded from wheel and
+source distributions. Missing/tampered artifacts or changed pins fail validation.
+Frozen registry dependencies are installed normally; private dependencies use
+the verified fixture bytes without resolving Git or receiving credentials.
+The separate PR workflow runs on disposable Ubuntu workers with read-only
+contents. The existing main workflow still resolves the actual private Git pins
+and retains its scoped credential and runner boundaries.
+
+Package CI exports complete runtime/resource contracts from actual wheels and
+binds candidate digests to those builds. Rebuilt-sdist contracts must match.
+Conservative byte comparisons reject implementation-only patch changes too;
+semantic compatibility, installer metadata and deployed consumers remain distinct.
+The PR lane also runs directory integration against disposable PostgreSQL.

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "line": "0.14",
+  "components": {
+    "controlplane-tenancy": {
+      "version": "0.14.0",
+      "contract": "contract.json",
+      "contract_sha256": "41119a9e3a38bc8ec1091a9b7a907c60d7ab07950168d2bfd00ce3334ad9044b",
+      "artifact": {
+        "kind": "package",
+        "uri": "urn:sha256:623f75e97b4c925c4f2cf94e6b16961667a827bcae9e7004620e280f80395e16",
+        "sha256": "623f75e97b4c925c4f2cf94e6b16961667a827bcae9e7004620e280f80395e16"
+      }
+    }
+  }
+}
