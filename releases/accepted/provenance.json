@@ -1,23 +1,14 @@
 {
+  "schema_version": 1,
   "repository": "hyperme-sh/controlplane-tenancy",
-  "revision": "c8f01df2b475d92a41977161f8a72e095765481e",
-  "release_id": 434639159,
-  "immutable": true,
-  "tag": "test-c8f01df2b475d92a41977161f8a72e095765481e",
-  "run_id": 41944874268,
-  "artifact_id": 13377283598,
+  "tag": "v0.24.0",
+  "revision": "bbebecc933413658a13b0e9e55b118bef6d2032b",
+  "release_id": 434687194,
   "assets": {
     "controlplane_tenancy-0.24.0-py3-none-any.whl": "sha256:8808aaa921f4833c19998dd4a844e720c6a36eea5e92b4d5337a0e9e3649e007",
-    "controlplane_tenancy-0.24.0.tar.gz": "sha256:a6583e30b0c50a2b3d202ff01b3c3cdb1b80aa6e1ba3cfdfe0c6eba45583edfe"
+    "controlplane_tenancy-0.24.0.tar.gz": "sha256:a6583e30b0c50a2b3d202ff01b3c3cdb1b80aa6e1ba3cfdfe0c6eba45583edfe",
+    "release-manifest.json": "sha256:9ae943783522647a0535b65423f4c43b45836f58c6f8f14a8a0b458bd7450689"
   },
-  "published_release_url": "https://github.com/hyperme-sh/controlplane-tenancy/releases/tag/test-c8f01df2b475d92a41977161f8a72e095765481e",
-  "checks": [
-    "successful same-repository main-push package run",
-    "live Actions artifact digest",
-    "release bytes equal tested bytes",
-    "immutable release and tag revision",
-    "asset digests equal manifest"
-  ],
-  "consumer_qualification": "Hosted PR and main passed all 13 directory/session consumers in source/fresh-wheel/rebuilt-sdist contexts, including six disposable PostgreSQL cases, plus 22 tooling tests. Actual downloaded wheel passed seven offline cases with six PostgreSQL cases explicitly skipped locally.",
-  "limitations": "Full deployed-service/legacy-alias and provider acceptance remain separate."
+  "published_release_url": "https://github.com/hyperme-sh/controlplane-tenancy/releases/tag/v0.24.0",
+  "qualification": "Existing immutable stable distribution; runtime deployment and coordinated consumer acceptance remain separate."
 }
