@@ -128,3 +128,8 @@ Marketplace startup retains the three owner-chain source cases: adoption of a
 frozen legacy database, explicit legacy mode, and fresh owner bootstrap. Each
 case checks repeatable provisioning, preservation of an existing name, and
 refusal to reactivate an inactive marketplace tenant.
+
+## License
+
+This package is licensed under [Apache-2.0](LICENSE). Dependencies retain their
+own licenses; this declaration does not relicense bundled third-party material.
