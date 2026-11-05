@@ -1,6 +1,6 @@
 # Release compatibility
 
-This component targets the shared **0.24.x** release line. Components share major
+This component targets the shared **1.0.x** release line. Components share major
 and minor versions; patch numbers advance independently and must preserve their
 accepted API contracts. Existing package versions are retained until a qualified
 release is prepared; installing this workflow does not qualify those versions.
@@ -19,7 +19,7 @@ Before attempting a release:
    baseline needs automated artifact/consumer qualification and provenance;
    examples and invented digests are not accepted release evidence.
 2. Generate the candidate bundle at `releases/candidate/release.json` from the
-   release artifacts. It must contain exactly this component, use line `0.24`,
+   release artifacts. It must contain exactly this component, use line `1.0`,
    and match every declared owning package version and the requested tag/version.
 3. Run admission against the trusted baseline. Patch contracts must remain
    unchanged; changing a published artifact at the same version is rejected.
