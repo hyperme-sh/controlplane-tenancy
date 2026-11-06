@@ -4,15 +4,15 @@
     {
       "distribution": "controlplane-db",
       "version": "0.1.0",
-      "dependency_revision": "8d57f8d979f3808cf8d4b78e99debe18864bd6b4",
-      "artifact_revision": "8d57f8d979f3808cf8d4b78e99debe18864bd6b4",
+      "dependency_revision": "20e5dcfde17f73e229e856a301278345a03a2f4b",
+      "artifact_revision": "20e5dcfde17f73e229e856a301278345a03a2f4b",
       "wheel": "controlplane_db-0.1.0-py3-none-any.whl",
-      "sha256": "8e84d295b90a84b2a1812956aca196a303869717d5788a42b7b92c2370433b75",
-      "source_url": "https://github.com/hyperme-sh/controlplane-db/tree/8d57f8d979f3808cf8d4b78e99debe18864bd6b4",
+      "sha256": "e8dd59279a939bfadc64c77f367a60e25c862e05959b4577ccebfc52057ad31a",
+      "source_url": "https://github.com/hyperme-sh/controlplane-db/tree/20e5dcfde17f73e229e856a301278345a03a2f4b",
       "qualification": "Exact-source development fixture; no prior release required and no publication claimed",
       "delivery": "local_build_from_exact_clean_git_revision",
-      "source_archive_sha256": "98e2d3beb2ed47787608d2c244361cd076c7996a4df70bce4887a3a159560c33",
-      "source_tree": "b2250855232aec47a391ca1df4f3cf1a6069b613",
+      "source_archive_sha256": "dad7cf0534f7440bd181e821a870f2ccbf6c31838b827e54a81e8daac170808c",
+      "source_tree": "154dda1098dee54394b4aef0f7d8e498b4274171",
       "build_command": "uv build --wheel <exact clean pinned git archive>"
     }
   ]
