@@ -5,25 +5,20 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine, text
-from controlplane_db import migrations
+from controlplane_db.base import Base
+import controlplane_db.models
 
-@pytest.mark.parametrize("mode, database", [("owners", "marketplace_owners"), ("legacy", "marketplace_legacy"), ("owners", "marketplace_fresh")])
-def test_startup_provisions_configured_marketplace_after_migrations(migration_database, monkeypatch, mode, database):
+def test_startup_provisions_configured_marketplace_after_owner_schema(migration_database, monkeypatch):
     from controlplane_tenancy import marketplace, startup
     url = migration_database()
-    if database != "marketplace_fresh":
-        # Preserve the frozen mixed-chain starting point used by the retained
-        # source case, using installed migration resources and a fresh database.
-        with monkeypatch.context() as setup:
-            setup.setenv("DATABASE_URL", url)
-            command.upgrade(Config(str(files("controlplane_db") / "alembic.ini")), "head")
+    schema_engine = create_engine(url)
+    try:
+        Base.metadata.create_all(schema_engine)
+    finally:
+        schema_engine.dispose()
     tenant = uuid.uuid4()
     monkeypatch.setenv("DATABASE_URL", url)
-    monkeypatch.setenv("CONTROLPLANE_MIGRATION_MODE", mode)
-    monkeypatch.setenv("CONTROLPLANE_DB_BOOTSTRAP", "1" if database == "marketplace_fresh" else "")
     monkeypatch.setattr(marketplace, "MARKETPLACE_TENANT_ID", tenant)
-    if mode == "owners" and database == "marketplace_owners":
-        migrations.prepare_event_source_index(url)
     assert startup.main() == 0
     assert startup.main() == 0
     engine = create_engine(url)

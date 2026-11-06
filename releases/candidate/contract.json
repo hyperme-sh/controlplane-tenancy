@@ -6,7 +6,7 @@
     "controlplane_tenancy/db_session.py": "021b1c895b0dd39392ad9156bd1369c12281c0d3d91097a268bd4d91d18e5f81",
     "controlplane_tenancy/directory.py": "fd352a36eb05c4eee6a2d1efd56ac4bb33003cddd4ae31d4ee7393192a954acb",
     "controlplane_tenancy/marketplace.py": "cef199d74ad4107814915c30fd211edc394af69a9576d665e2258f8ac1a29e45",
-    "controlplane_tenancy/startup.py": "9d29927be4c59f4c2cad9b96a4c3cecef1c4324680fe9c206f9e8245feb99d19",
+    "controlplane_tenancy/startup.py": "61f154b28f83794eb3767072e37730698e8ff2d210c0c7412a9136b67a891e86",
     "controlplane_tenancy/tenant_guc.py": "c19a11f6c80163ba580e3ba269c24749b97dea18a8c894529bb18ef2ba8a27d2",
     "controlplane_tenancy/tenant_membership.py": "844c8e3ac7e9dccf30acaf1b9a042c4c633b49db8c44246e57fbb98571beda8d",
     "controlplane_tenancy/tenant_registry.py": "b69efd971a4da578e27471e5ca58d9162e0f7039927487dead889eef97594c8a"

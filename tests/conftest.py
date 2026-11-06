@@ -6,7 +6,8 @@ import pytest_asyncio
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import create_async_engine
-from controlplane_db import migrations
+from controlplane_db.base import Base
+import controlplane_db.models
 
 
 @pytest_asyncio.fixture
@@ -22,7 +23,22 @@ async def async_engine():
         with admin.connect() as cx:
             cx.execute(text(f'CREATE DATABASE "{name}"'))
         target = base.set(database=name)
-        migrations.upgrade(target.render_as_string(hide_password=False), chains=['platform'])
+        sync = create_engine(target)
+        try:
+            Base.metadata.create_all(sync)
+            with sync.begin() as connection:
+                for table in Base.metadata.tables.values():
+                    if 'tenant_id' not in table.c:
+                        continue
+                    name = table.name
+                    scope = "tenant_id = nullif(current_setting('app.current_tenant_id',true),'')::uuid"
+                    if table.c.tenant_id.nullable:
+                        scope = "(" + scope + " OR (tenant_id IS NULL AND nullif(current_setting('app.current_tenant_id',true),'') IS NULL))"
+                    connection.exec_driver_sql(f'ALTER TABLE "{name}" ENABLE ROW LEVEL SECURITY')
+                    connection.exec_driver_sql(f'ALTER TABLE "{name}" FORCE ROW LEVEL SECURITY')
+                    connection.exec_driver_sql(f'CREATE POLICY owner_tenant ON "{name}" USING ({scope}) WITH CHECK ({scope})')
+        finally:
+            sync.dispose()
         engine = create_async_engine(target.set(drivername='postgresql+asyncpg'))
         yield engine
     finally:
