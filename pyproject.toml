@@ -8,7 +8,7 @@ version = "0.14.0"
 requires-python = ">=3.13"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-dependencies = ["controlplane-db @ git+https://github.com/hyperme-sh/controlplane-db.git@20e5dcfde17f73e229e856a301278345a03a2f4b", "sqlalchemy>=2.0.43"]
+dependencies = ["controlplane-db @ git+https://github.com/hyperme-sh/controlplane-db.git@022e068465b855efbc9071541d3e2963e11e39ef", "sqlalchemy>=2.0.43"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/controlplane_tenancy"]
