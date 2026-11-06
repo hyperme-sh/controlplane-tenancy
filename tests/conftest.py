@@ -6,7 +6,8 @@ import pytest_asyncio
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import create_async_engine
-from controlplane_db import migrations
+from controlplane_db.base import Base
+import controlplane_db.models
 
 
 @pytest_asyncio.fixture
@@ -15,21 +16,36 @@ async def async_engine():
     if not url:
         pytest.fail('requires disposable PostgreSQL TEST_DATABASE_URL')
     base = make_url(url).set(drivername='postgresql+psycopg')
-    name = 'tenancy_test_' + uuid.uuid4().hex
+    database_name = 'tenancy_test_' + uuid.uuid4().hex
     admin = create_engine(base, isolation_level='AUTOCOMMIT')
     engine = None
     try:
         with admin.connect() as cx:
-            cx.execute(text(f'CREATE DATABASE "{name}"'))
-        target = base.set(database=name)
-        migrations.upgrade(target.render_as_string(hide_password=False), chains=['platform'])
+            cx.execute(text(f'CREATE DATABASE "{database_name}"'))
+        target = base.set(database=database_name)
+        sync = create_engine(target)
+        try:
+            Base.metadata.create_all(sync)
+            with sync.begin() as connection:
+                for table in Base.metadata.tables.values():
+                    if 'tenant_id' not in table.c:
+                        continue
+                    table_name = table.name
+                    scope = "tenant_id = nullif(current_setting('app.current_tenant_id',true),'')::uuid"
+                    if table.c.tenant_id.nullable:
+                        scope = "(" + scope + " OR (tenant_id IS NULL AND nullif(current_setting('app.current_tenant_id',true),'') IS NULL))"
+                    connection.exec_driver_sql(f'ALTER TABLE "{table_name}" ENABLE ROW LEVEL SECURITY')
+                    connection.exec_driver_sql(f'ALTER TABLE "{table_name}" FORCE ROW LEVEL SECURITY')
+                    connection.exec_driver_sql(f'CREATE POLICY owner_tenant ON "{table_name}" USING ({scope}) WITH CHECK ({scope})')
+        finally:
+            sync.dispose()
         engine = create_async_engine(target.set(drivername='postgresql+asyncpg'))
         yield engine
     finally:
         if engine is not None:
             await engine.dispose()
         with admin.connect() as cx:
-            cx.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+            cx.execute(text(f'DROP DATABASE IF EXISTS "{database_name}" WITH (FORCE)'))
         admin.dispose()
 
 

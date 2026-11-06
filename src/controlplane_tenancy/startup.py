@@ -1,14 +1,12 @@
-"""Apply schema heads, then provision the configured marketplace before apps seed."""
+"""Provision the configured marketplace after the owning service provisions its schema."""
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
-from controlplane_db import startup as database_startup
 from controlplane_db.session import default_database_url
 from controlplane_tenancy.marketplace import ensure_marketplace_tenant
 
 
 def main() -> int:
-    database_startup.main()
     engine = create_engine(
         make_url(default_database_url()).set(drivername="postgresql+psycopg")
     )
