@@ -1,50 +1,37 @@
 # Release compatibility
 
-This component targets the shared **1.0.x** release line. Components share major
-and minor versions; patch numbers advance independently and must preserve their
-accepted API contracts. Existing package versions are retained until a qualified
-release is prepared; installing this workflow does not qualify those versions.
+Channel publication for this repository is documented in
+[releasing.md](releasing.md). The configured line in `release-policy.json` and
+`.github/workflows/release.yml` is **0.14**, matching package version 0.14.0.
+A patch on that line keeps the accepted API contract. Installing the workflow
+does not publish a release.
 
-`release-policy.json` identifies the owner and every owning package version file.
-The pinned Spanopticon workflow checks this configuration on pull requests.
-Version changes or a `releases/candidate/release.json` submission also require
-release admission. Every tag push and manual release request requires admission.
-A configuration-only result is not a release compatibility result.
+`release-policy.json` names the component and the version file
+(`pyproject.toml`). The pinned Spanopticon workflow checks that file on pull
+requests. A version change or a `releases/candidate/release.json` submission
+also runs admission. A tag push and a manual release request run admission
+too. A configuration-only result is not a compatibility result.
 
-Before attempting a release:
+Before a stable tag:
 
-1. Produce a real accepted bundle at `releases/accepted/release.json`, with its
-   contract files and immutable artifact references. Set the repository variable
-   `SPANOPTICON_RELEASE_BASELINE_SHA` to its full 40-character commit SHA. The first
-   baseline needs automated artifact/consumer qualification and provenance;
-   examples and invented digests are not accepted release evidence.
-2. Generate the candidate bundle at `releases/candidate/release.json` from the
-   release artifacts. It must contain exactly this component, use line `1.0`,
-   and match every declared owning package version and the requested tag/version.
-3. Run admission against the trusted baseline. Patch contracts must remain
-   unchanged; changing a published artifact at the same version is rejected.
-   Verify artifact provenance and downstream consumer behavior separately.
-4. Make successful admission and artifact/consumer validation automated
-   prerequisites of the publisher for the exact release. Select the accepted
-   baseline independently of candidate data and retain the validation evidence.
-   This is pipeline validation, not a branch protection or human approval rule.
+1. Put an accepted bundle at `releases/accepted/release.json`, with its
+   contract files and immutable artifact references. Set the repository
+   variable `SPANOPTICON_RELEASE_BASELINE_SHA` to that baseline's full
+   40-character commit SHA. The baseline comes from a real qualification run
+   and its provenance. Example digests are not release evidence.
+2. Generate `releases/candidate/release.json` from the release artifacts. The
+   candidate contains this component only, uses line `0.14`, and matches
+   `pyproject.toml` plus the requested tag.
+3. Run admission against the baseline. The patch contract stays unchanged.
+   Replacing the bytes of an artifact already published at the same version
+   is rejected. Check artifact provenance and downstream consumer behavior
+   separately.
+4. The `v*` publisher runs that admission, and the artifact check, for the
+   exact tag before it publishes. The baseline is selected from
+   `SPANOPTICON_RELEASE_BASELINE_SHA`, not from the candidate file. Keep the
+   validation evidence with the run.
 
-Missing baselines fail closed. This workflow neither publishes nor deploys and
-does not enable repository Actions, grant private dependency access, or prove
-that a declared artifact exists. See the [Spanopticon release policy](https://github.com/hyperme-sh/spanopticon/blob/main/docs/releases.md)
-for the manifest format and compatibility rules.
-
-Do not add required reviewers, branch protections, approval rulesets, environment
-approvals, CODEOWNERS approval requirements, or release/deployment approval gates
-unless the user explicitly requests that specific change. This includes production
-releases. Automated tests and advisory reviews are welcome; human approval
-prerequisites are not. GitHub plan upgrades are not release-adoption prerequisites.
-
-### Actions qualification and stable publication
-
-Main merges and workflow completion do not publish GitHub test releases. Exact
-qualification files remain in Actions artifacts with finite retention. The pinned
-publisher independently verifies a real immutable stable baseline and refuses
-qualification snapshots, even if a caller job reports success. Existing valid
-stable records are retained; no release, version change, deployment or human
-approval prerequisite is introduced by this correction.
+A missing baseline stops admission. The workflow does not publish, deploy,
+enable repository Actions, or grant database-dependency access. Manifest
+fields are specified in the
+[Spanopticon release notes](https://github.com/hyperme-sh/spanopticon/blob/main/docs/releases.md).
