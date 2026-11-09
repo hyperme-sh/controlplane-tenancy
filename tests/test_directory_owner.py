@@ -212,6 +212,7 @@ async def test_corrupt_cross_tenant_join_rows_never_grant_directory_membership(d
         assert not await SqlMembershipRepository(session).exists(ta, a.id, gb.id)
         assert not await SqlMembershipRepository(session).exists(ta, b.id, ga.id)
         assert await get_tenant_role_group_ids(session, ta, user_id=a.id, role="host") == []
+        assert await get_tenant_role_group_ids(session, ta, user_id=b.id, role="host") == []
         await session.rollback()
 
 
@@ -224,6 +225,10 @@ async def test_tenant_registry_pages_status_and_caller_lock(directory):
         assert await tenant_active(owner, uuid.uuid4()) is None
         assert await tenant_active(owner, ta, lock=True) is True
         await observer.execute(text("SET LOCAL lock_timeout = '100ms'"))
+        # A child INSERT takes this parent lock during its foreign-key check.
+        assert await observer.scalar(
+            text("SELECT id FROM tenants WHERE id = :id FOR KEY SHARE"), {"id": ta}
+        ) == ta
         with pytest.raises(DBAPIError):
             await observer.execute(text("UPDATE tenants SET is_active = false WHERE id = :id"), {"id": ta})
         await observer.rollback()

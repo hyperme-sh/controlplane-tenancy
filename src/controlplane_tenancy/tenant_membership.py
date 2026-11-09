@@ -185,16 +185,18 @@ async def get_tenant_role_group_ids(
     Products apply their own group policies to opaque IDs; membership tables
     remain owned and queried by this shared contract.
     """
-    from controlplane_db.models import Group, UserGroupMembership
+    from controlplane_db.models import Group, User, UserGroupMembership
 
     return list(
         await session.scalars(
             select(UserGroupMembership.group_id)
             .join(Group, Group.id == UserGroupMembership.group_id)
+            .join(User, User.id == UserGroupMembership.user_id)
             .where(
                 UserGroupMembership.tenant_id == tenant_id,
                 UserGroupMembership.user_id == user_id,
                 Group.tenant_id == tenant_id,
+                User.tenant_id == tenant_id,
                 func.lower(Group.name) == role.lower(),
             )
         )
