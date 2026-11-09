@@ -28,5 +28,6 @@ async def tenant_active(session: AsyncSession, tenant_id: UUID, *,
     """Read active status, optionally holding its row lock until caller completion."""
     stmt = select(Tenant.is_active).where(Tenant.id == tenant_id)
     if lock:
-        stmt = stmt.with_for_update()
+        # FOR SHARE fences tenant changes while allowing foreign-key checks.
+        stmt = stmt.with_for_update(read=True)
     return await session.scalar(stmt)
