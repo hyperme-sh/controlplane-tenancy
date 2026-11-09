@@ -8,8 +8,8 @@
     "controlplane_tenancy/marketplace.py": "cef199d74ad4107814915c30fd211edc394af69a9576d665e2258f8ac1a29e45",
     "controlplane_tenancy/startup.py": "61f154b28f83794eb3767072e37730698e8ff2d210c0c7412a9136b67a891e86",
     "controlplane_tenancy/tenant_guc.py": "c19a11f6c80163ba580e3ba269c24749b97dea18a8c894529bb18ef2ba8a27d2",
-    "controlplane_tenancy/tenant_membership.py": "844c8e3ac7e9dccf30acaf1b9a042c4c633b49db8c44246e57fbb98571beda8d",
-    "controlplane_tenancy/tenant_registry.py": "b69efd971a4da578e27471e5ca58d9162e0f7039927487dead889eef97594c8a"
+    "controlplane_tenancy/tenant_membership.py": "6617a82ab9511b0382b66f49f404107ee01795be8f92dd399fedfdaf1eb247e3",
+    "controlplane_tenancy/tenant_registry.py": "2179e67362717486e1710a4f6f5c1505a81af2984382b8391aafa7ba936efa85"
   },
   "schema_version": 1
 }
