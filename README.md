@@ -280,3 +280,18 @@ are documented in [docs/releasing.md](docs/releasing.md).
 
 This package is licensed under [Apache-2.0](LICENSE). Dependencies retain their
 own licenses; this declaration does not relicense bundled third-party material.
+
+## Explicit organization roles
+
+`organization_membership.SqlOrganizationRoleRepository` reads or adds explicit
+`member`, `owner` and `admin` roles for an existing active tenant user and an
+existing organization. It never creates a person, changes tenant roles/groups,
+or derives administrative authority from ordinary membership. The calling
+service authenticates the reconciler and sets the tenant GUC first.
+
+`ensure(tenant_id, organization_id, user_id, roles)` locks the scoped parent
+rows, snapshots the requested roles before awaiting, and uses database uniqueness
+for concurrent identical retries. It preserves unrelated roles and returns a
+detached tuple. Missing, foreign, inactive or deleted references refuse writes;
+reads for inactive/deleted users return no roles. The caller owns commit and
+rollback, including rollback after a later reconciliation step fails.
