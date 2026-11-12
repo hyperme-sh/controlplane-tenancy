@@ -5,11 +5,11 @@
     "controlplane-tenancy": {
       "version": "0.14.0",
       "contract": "contract.json",
-      "contract_sha256": "6a20a1b7cba01c06ab74eaa072c5ec768412804ff8d86ec94e4cb2eb53b42dee",
+      "contract_sha256": "71a7f6f3a53119d7eafcff34d9810c194a452edb6229a880bab379dd60ca2a9c",
       "artifact": {
         "kind": "package",
-        "uri": "urn:sha256:5e6f75a88e69defd2fd0f55f0b8c25481c8dc62486bcecd303bbae4af230c7f8",
-        "sha256": "5e6f75a88e69defd2fd0f55f0b8c25481c8dc62486bcecd303bbae4af230c7f8"
+        "uri": "urn:sha256:a36af56ab3150dccb58785a761ceba40da77509045d72ed6d96572dbf27e3101",
+        "sha256": "a36af56ab3150dccb58785a761ceba40da77509045d72ed6d96572dbf27e3101"
       }
     }
   }
