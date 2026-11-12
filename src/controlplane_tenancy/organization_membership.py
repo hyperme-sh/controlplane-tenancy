@@ -10,7 +10,7 @@ from controlplane_tenancy.directory import DirectoryLinkError
 
 
 def _scope(tenant_id: UUID, organization_id: UUID, user_id: UUID) -> None:
-    if any(type(value) is not UUID or not value.int for value in (tenant_id, organization_id, user_id)):
+    if any(not isinstance(value, UUID) or not value.int for value in (tenant_id, organization_id, user_id)):
         raise DirectoryLinkError('Explicit organization membership scope required')
 
 

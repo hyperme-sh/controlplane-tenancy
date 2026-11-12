@@ -63,3 +63,12 @@ async def test_requested_roles_are_copied_before_awaiting_references():
     await SqlOrganizationRoleRepository(db).ensure(uuid4(), uuid4(), uuid4(), requested)
     statement = db.execute.call_args.args[0].compile(dialect=postgresql.dialect())
     assert statement.params['role_m0'] == 'member'
+
+
+async def test_database_driver_uuid_subclasses_are_valid_scope():
+    class DriverUUID(UUID):
+        pass
+    db = session()
+    scope = tuple(DriverUUID(str(uuid4())) for _ in range(3))
+    assert await SqlOrganizationRoleRepository(db).ensure(*scope, ['member']) == ('admin', 'member', 'owner')
+    db.execute.assert_awaited_once()
