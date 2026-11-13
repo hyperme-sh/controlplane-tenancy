@@ -85,11 +85,10 @@ dependencies = [
 ```
 
 That URL tracks the default branch, whose package version is 0.14.0. The
-prerelease tag `0.24.0-test.0` is the same tree. The GitHub release `v0.24.0`
-is an earlier commit whose package version is 0.24.0 and whose
-`controlplane-db` pin is `6ee52fe3e775548956cada649715fdde80f6cd1d`. Use the
-default branch or `0.24.0-test.0` to match this document. Channel details are
-in [docs/releasing.md](docs/releasing.md).
+GitHub release `v0.24.0` is an earlier commit whose package version is 0.24.0
+and whose `controlplane-db` pin is `6ee52fe3e775548956cada649715fdde80f6cd1d`.
+Use the default branch to match this document. Channel details are in
+[docs/releasing.md](docs/releasing.md).
 
 ### Tenant context
 
@@ -270,11 +269,9 @@ script.
 
 ## Release and versioning
 
-This tree's Python package version is **0.14.0**. Successful validation of
-`main` can publish an immutable prerelease named `0.24.0-test.N`. That name is
-the coordinated test train; the wheel inside it is still 0.14.0. The GitHub
-release `v0.24.0` is an earlier package. Tags, channels, and the publisher
-are documented in [docs/releasing.md](docs/releasing.md).
+This tree's Python package version is **0.14.0**. Automatic package
+prereleases are not published. The GitHub release `v0.24.0` is an earlier
+package. Tags and channels are documented in [docs/releasing.md](docs/releasing.md).
 
 ## License
 
