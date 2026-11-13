@@ -2,7 +2,7 @@
 
 Channel publication for this repository is documented in
 [releasing.md](releasing.md). The configured line in `release-policy.json` and
-`.github/workflows/release.yml` is **0.14**, matching package version 0.14.0.
+`.github/workflows/release-admission.yml` is **0.14**, matching package version 0.14.0.
 A patch on that line keeps the accepted API contract. Installing the workflow
 does not publish a release.
 
