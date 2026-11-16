@@ -42,8 +42,8 @@ transactions. Never import product or legacy implementation modules.
 
 Run `bash scripts/check-package.sh`; set `TEST_DATABASE_URL` only to a disposable
 PostgreSQL instance for directory integration cases. The fixture creates and drops
-a unique test database and applies only platform migrations there. Private database
-package read access must be provided externally, never stored in source or wheels.
+a unique test database and applies only platform migrations there. The pinned database
+source is public; qualification must work without private dependency credentials.
 
 ## Package publication permission boundary
 
@@ -63,9 +63,12 @@ The user is the sole developer. Never add or enable GitHub required reviewers, b
 ## Isolated dependency fixtures
 
 The read-only PR qualification workflow may use disposable hosted Ubuntu workers
-with verified real dependency wheels and no private credentials. Preserve the
-existing main runner/credential lane. Test fixtures must remain outside published
-distributions and match both project pins and the frozen lock.
+with verified real dependency wheels and no private credentials. PR and main
+qualification fetch the frozen public dependency graph anonymously with fresh
+home/cache/project environments. Keep the existing runner policy; do not restore
+a private App token or credential environment for public dependencies. Optional
+test fixtures remain outside published distributions and must match both project
+pins and the frozen lock.
 
 ## Private CI runner policy
 

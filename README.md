@@ -6,7 +6,7 @@ and reads membership rows, and provisions the marketplace tenant. Directory and
 registry calls sit on the same session the caller already opened. The package
 version is **0.14.0**. It requires Python 3.13 and depends on
 [`controlplane-db`](https://github.com/hyperme-sh/controlplane-db) 0.1.0 at
-commit `95ef61433374274f4a4fc287e15982be6357e1cc` and `sqlalchemy>=2.0.43`.
+commit `10700d4ed2525216e475fee4f7fd573a0da9323b` and `sqlalchemy>=2.0.43`.
 
 ## Why
 
@@ -292,3 +292,18 @@ for concurrent identical retries. It preserves unrelated roles and returns a
 detached tuple. Missing, foreign, inactive or deleted references refuse writes;
 reads for inactive/deleted users return no roles. The caller owns commit and
 rollback, including rollback after a later reconciliation step fails.
+
+## Publication preparation
+
+PR and main qualification fetch the frozen public dependency graph in fresh
+home/cache/project environments without inherited Git or registry credentials.
+The existing disposable database contracts remain in CI. Package bytes and
+reports are internal validation only; normal CI retains no Actions uploads or
+release output. The exact DB source revision is a build input, not a running
+service pin.
+
+Distribution preparation follows FyberLabs/infra#993: GHCR containers and moving
+TEST channels, with integration/e2e in nightly CI. This library has no standalone
+service entrypoint. Owner/dependency notices, history review and GHCR consumer
+image preparation remain follow-ups. No source archives are bundled for
+redistribution; no visibility, history or version changes are introduced.
