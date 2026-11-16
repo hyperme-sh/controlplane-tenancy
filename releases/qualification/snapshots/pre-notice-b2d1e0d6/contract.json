@@ -1,0 +1,16 @@
+{
+  "coverage": "conservative complete packaged tenancy runtime and packaged resource bytes",
+  "packaged_file_sha256": {
+    "controlplane_tenancy/__init__.py": "1d3e1c9bc56adf99f0e5482ea7ab2c04cc5dd8c40a9fc5c11af13720ec16b430",
+    "controlplane_tenancy/account_profile.py": "c491223c97bf63dfd6f4b84d4bab6fa6bd43ed6997618e96c14931ec9b0a7682",
+    "controlplane_tenancy/db_session.py": "021b1c895b0dd39392ad9156bd1369c12281c0d3d91097a268bd4d91d18e5f81",
+    "controlplane_tenancy/directory.py": "fd352a36eb05c4eee6a2d1efd56ac4bb33003cddd4ae31d4ee7393192a954acb",
+    "controlplane_tenancy/marketplace.py": "cef199d74ad4107814915c30fd211edc394af69a9576d665e2258f8ac1a29e45",
+    "controlplane_tenancy/organization_membership.py": "f7ddfb41e997a2e086801e061f3426d164cd5044ebf5e5892d043050efb57580",
+    "controlplane_tenancy/startup.py": "61f154b28f83794eb3767072e37730698e8ff2d210c0c7412a9136b67a891e86",
+    "controlplane_tenancy/tenant_guc.py": "c19a11f6c80163ba580e3ba269c24749b97dea18a8c894529bb18ef2ba8a27d2",
+    "controlplane_tenancy/tenant_membership.py": "6617a82ab9511b0382b66f49f404107ee01795be8f92dd399fedfdaf1eb247e3",
+    "controlplane_tenancy/tenant_registry.py": "2179e67362717486e1710a4f6f5c1505a81af2984382b8391aafa7ba936efa85"
+  },
+  "schema_version": 1
+}
