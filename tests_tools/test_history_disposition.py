@@ -32,3 +32,28 @@ def test_changed_history_or_disposition_is_refused(monkeypatch, change):
     if change == 'disposition': ledger['findings'][0]['disposition'] = 'publish'
     if change == 'clearance': ledger['publication_cleared'] = True
     with pytest.raises(ValueError): history.verify(report, ledger)
+
+
+@pytest.mark.parametrize('change', ['none', 'member-hash', 'duplicate-member'])
+def test_archived_member_hash_and_ambiguity(monkeypatch, change):
+    import io
+    import zipfile
+    archive = io.BytesIO()
+    with zipfile.ZipFile(archive, 'w') as z:
+        z.writestr('schema.py', b'old')
+        if change == 'duplicate-member':
+            with pytest.warns(UserWarning):
+                z.writestr('schema.py', b'other')
+    raw = archive.getvalue()
+    report, ledger = fixture()
+    for row in (report['history_findings'][0], ledger['findings'][0]):
+        row['member'] = 'schema.py'
+    ledger['findings'][0]['blob_sha256'] = hashlib.sha256(raw).hexdigest()
+    if change == 'member-hash':
+        ledger['findings'][0]['content_sha256'] = '0' * 64
+    monkeypatch.setattr(history.subprocess, 'check_output', lambda *a: raw)
+    if change == 'none':
+        assert history.verify(report, ledger)['reviewed_coordinates'] == 1
+    else:
+        with pytest.raises(ValueError):
+            history.verify(report, ledger)

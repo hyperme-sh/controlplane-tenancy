@@ -30,5 +30,5 @@ channels; integration/e2e stays nightly. No Actions uploads or visibility change
 The retained-content ledger in `../historical-distributions/content-review.json`
 binds all 392 flagged archived DB members to blob/member hashes, classifications
 and retained-not-cleared dispositions. CI rejects new or altered coordinates,
-bytes and dispositions. These historical payment/mixed schemas remain retained;
+bytes and dispositions. These historical payment schemas remain retained;
 this review does not authorize public redistribution or rewrite old refs.
