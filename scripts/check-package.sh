@@ -33,6 +33,7 @@ uv build --out-dir "$scratch/dist"
 uv run --frozen "${run_options[@]}" python scripts/verify_wheel.py "$scratch/dist"
 uv run --frozen "${run_options[@]}" pytest -q tests_tools
 uv run --frozen "${run_options[@]}" python scripts/export_release_contract.py "$scratch"/dist/*.whl --output "$scratch/contract"
+sha256sum "$scratch"/dist/*.whl
 if [[ -f releases/candidate/release.json ]]; then
   uv run --frozen "${run_options[@]}" python scripts/verify_release_candidate.py releases/candidate/release.json "$scratch/contract/contract.json" "$scratch/contract/evidence.json" controlplane-tenancy
 fi
