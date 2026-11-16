@@ -77,3 +77,31 @@ def test_unavailable_inventory_is_scoped_to_exact_endpoints():
     assert not registry.unavailable(HTTPError(url, 500, 'server', {}, None))
     assert not registry.unavailable(HTTPError(url.replace('controlplane-tenancy', 'other'), 404, 'missing', {}, None))
     assert not registry.unavailable(HTTPError(url.replace('api.github.com', 'other.invalid'), 404, 'missing', {}, None))
+
+
+def test_historical_configuration_is_recorded_without_skipping_layers(tmp_path):
+    import io
+    import tarfile
+    spec = importlib.util.spec_from_file_location('inspect_configured', ROOT / 'scripts/inspect-container.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    layer = io.BytesIO()
+    with tarfile.open(fileobj=layer, mode='w') as archive:
+        member = tarfile.TarInfo('old.txt')
+        member.size = 3
+        archive.addfile(member, io.BytesIO(b'old'))
+    image = tmp_path / 'image.tar'
+    with tarfile.open(image, 'w') as archive:
+        files = {'manifest.json': json.dumps([{'Config': 'config.json', 'Layers': ['layer.tar']}]).encode(),
+                 'config.json': json.dumps({'config': {'User': '65532:65532', 'Env': ['HYPERMESH_REGION=test']}}).encode(),
+                 'layer.tar': layer.getvalue()}
+        for name, data in files.items():
+            member = tarfile.TarInfo(name)
+            member.size = len(data)
+            archive.addfile(member, io.BytesIO(data))
+    result = module.unpack_image(image, tmp_path / 'historical', enforce_user=False)
+    assert result['configured_environment_names'] == ['HYPERMESH_REGION']
+    assert (tmp_path / 'historical/0/old.txt').read_bytes() == b'old'
+    assert (tmp_path / 'historical/image-config.json').is_file()
+    with pytest.raises(ValueError, match='configuration'):
+        module.unpack_image(image, tmp_path / 'current')

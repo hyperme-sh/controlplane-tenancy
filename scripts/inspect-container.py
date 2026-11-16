@@ -12,10 +12,13 @@ def unpack_image(archive, destination, *, enforce_user=True):
         if len(manifest)!=1:raise ValueError('Expected one saved image')
         config=json.load(outer.extractfile(manifest[0]['Config']))
         if enforce_user and config.get('config',{}).get('User')!='65532:65532':raise ValueError('Runtime must be unprivileged')
+        configured_names = []
         for variable in config.get('config', {}).get('Env', []):
             key = variable.partition('=')[0]
             if key.startswith(('HYPERMESH_', 'CONDUCTOR_')):
-                raise ValueError('Image must not inherit routing or credential configuration')
+                configured_names.append(key)
+                if enforce_user:
+                    raise ValueError('Image must not inherit routing or credential configuration')
         for i,name in enumerate(manifest[0]['Layers']):
             target=destination/str(i);target.mkdir(parents=True)
             with tarfile.open(fileobj=outer.extractfile(name)) as layer:
@@ -27,7 +30,7 @@ def unpack_image(archive, destination, *, enforce_user=True):
                     if member.isfile() or member.isdir():members.append(member)
                 layer.extractall(target,members=members,filter='data')
         (destination/"image-config.json").write_text(json.dumps(config,indent=2))
-        return {"layers":len(manifest[0]["Layers"]),"user":config.get("config",{}).get("User", "")}
+        return {"layers":len(manifest[0]["Layers"]),"user":config.get("config",{}).get("User", ""), "configured_environment_names": sorted(set(configured_names))}
 
 
 

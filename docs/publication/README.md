@@ -27,7 +27,7 @@ reported explicitly; post-publication inventory and scans must succeed.
 Deleted images and other registries are outside this review. TEST stays on moving
 channels; integration/e2e stays nightly. No Actions uploads or visibility changes.
 
-The retained-content ledger in `../historical-distributions/content-review.json`
+The retained-content ledger in `.github/workflows/historical-content-review.json`
 binds all 392 flagged archived DB members to blob/member hashes, classifications
 and retained-not-cleared dispositions. CI rejects new or altered coordinates,
 bytes and dispositions. These historical payment schemas remain retained;
