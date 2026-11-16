@@ -305,7 +305,8 @@ service pin.
 Distribution preparation follows FyberLabs/infra#993: GHCR containers and moving
 TEST channels, with integration/e2e in nightly CI. This library has no standalone
 service entrypoint. Owner/dependency notices, history checks and GHCR consumer
-image preparation run in CI. Retained-image review and activation remain separate. No source archives are bundled for
+image preparation run in CI. Retained GHCR images are inspected, and qualified main builds publish to the
+moving `runtime:test` channel. No source archives are bundled for
 redistribution; no visibility, history or version changes are introduced.
 
 The [publication record](docs/publication/README.md) describes the owner and
